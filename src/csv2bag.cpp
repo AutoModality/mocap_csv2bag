@@ -70,43 +70,44 @@ int main(int argc, char **argv)
 
     std::string line; // we read the full line here
     std::getline(ifile, line); //read the first line
-    std::istringstream iss{line}; // construct a string stream from line
-	// read the tokens from current line separated by comma
-	std::vector<std::string> tokens; // here we store the tokens
-	std::string token; // current token
-	for (int i = 0; i < 10; i++)
-	{
-		std::getline(iss, token, ',');
-		tokens.push_back(token); // add the token to the vector
-	}
-	std::string start_time_str = tokens.at(9); // if system time is required, adjust data time with this time; it is only with precision of seconds.
-	std::cout << "The start time of logging data on Motive: " << start_time_str << std::endl;
-	std::tm t = {};
-	std::time_t start_time_epoch;
-	if (start_time_str.substr(20, 2) == "PM")
-	{
-		start_time_str = start_time_str.substr(0,11) + std::to_string(std::stoi(start_time_str.substr(11, 2)) + 12) + start_time_str.substr(13, 6);
-		//std::cout << start_time_str << "\n";
-	}
-	else if (start_time_str.substr(20, 2) != "AM")
-	{
-		std::cout << "Wrong locale" << "\n";
-		return -1;
-	}
-	std::istringstream ss(start_time_str);
+//    std::istringstream iss{line}; // construct a string stream from line
+//	// read the tokens from current line separated by comma
+//	std::vector<std::string> tokens; // here we store the tokens
+//	std::string token; // current token
+//	for (int i = 0; i < 10; i++)
+//	{
+//		std::getline(iss, token, ',');
+//		tokens.push_back(token); // add the token to the vector
+//	}
+//	std::string start_time_str = tokens.at(9); // if system time is required, adjust data time with this time; it is only with precision of seconds.
+//	std::cout << "The start time of logging data on Motive: " << start_time_str << std::endl;
+//	std::tm t = {};
+//	std::time_t start_time_epoch;
+//	if (start_time_str.substr(20, 2) == "PM")
+//	{
+//		start_time_str = start_time_str.substr(0,11) + std::to_string(std::stoi(start_time_str.substr(11, 2)) + 12) + start_time_str.substr(13, 6);
+//		//std::cout << start_time_str << "\n";
+//	}
+//	else if (start_time_str.substr(20, 2) != "AM")
+//	{
+//		std::cout << "Wrong locale" << "\n";
+//		return -1;
+//	}
+//	std::istringstream ss(start_time_str);
+//
+//	if (ss >> std::get_time(&t, "%Y-%m-%d %H.%M.%S"))
+//	{
+//	   //std::cout << std::put_time(&t, "%c") << "\n" << std::mktime(&t) << "\n";
+//	   start_time_epoch = std::mktime(&t);
+//	   std::cout << "Start time in epoch: " << start_time_epoch << "\n";
+//	}
+//	else
+//	{
+//		std::cout << "Parse failed\n";
+//	}
 
-	if (ss >> std::get_time(&t, "%Y-%m-%d %H.%M.%S"))
-	{
-	   //std::cout << std::put_time(&t, "%c") << "\n" << std::mktime(&t) << "\n";
-	   start_time_epoch = std::mktime(&t);
-	   std::cout << "Start time in epoch: " << start_time_epoch << "\n";
-	}
-	else
-	{
-		std::cout << "Parse failed\n";
-	}
-
-    for (int i = 1; i < 7; i++) std::getline(ifile, line); // seek over the left header
+    int i = 0;
+    for (i = 1; i < 7; i++) std::getline(ifile, line); // seek over the left header
 
     while (std::getline(ifile, line)) // read the current line
     {
@@ -114,11 +115,15 @@ int main(int argc, char **argv)
         // read the tokens from current line separated by comma
         std::vector<std::string> tokens; // here we store the tokens
         std::string token; // current token
-        for (int i = 0; i < 10; i++) 
+        for (i = 0; i < 10; i++)
         {
 			std::getline(iss, token, ',');
+			if (token.empty()) break;
             tokens.push_back(token); // add the token to the vector
         }
+
+        if (i < 10) break;
+
         optitrack_pose.header.seq = std::stoi(tokens[0]); // frame index in Motive log file
         //optitrack_pose.header.stamp = ros::Time(std::stod(tokens[1])); // frame time in Motive log file
         optitrack_pose.header.stamp = ros::Time(interrupt_time + std::stod(tokens[1]));
