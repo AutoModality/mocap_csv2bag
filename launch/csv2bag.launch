@@ -1,0 +1,10 @@
+<launch>
+ 
+	<node name="csv2bag" pkg="mocap_csv2bag" type="mocap_csv2bag" output="screen">
+		<param name="mocap_bag_file_read" value="/home/wt70707/testdata/20180504/LC-0001_fixed.bag"/>  
+		<param name="synchronizer_topic" value="/interrupt_time"/>        
+		<param name="motive_csv_file" value="/home/wt70707/testdata/20180504/TakeC-0001.csv"/>  
+		<param name="motive_bag_file" value="/home/wt70707/testdata/20180504/TakeC-0001.bag"/> 
+    </node>
+    
+</launch>
